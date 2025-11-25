@@ -1,4 +1,5 @@
 using Zenject;
+using UnityEngine;
 
 public class GameInstaller : MonoInstaller
 {
@@ -8,15 +9,19 @@ public class GameInstaller : MonoInstaller
 
     public override void InstallBindings()
     {
-        // Bind model as a simple instance
+        // Core model & services
         Container.Bind<GameModel>().AsSingle();
+        Container.Bind<SaveService>().AsSingle();
 
-        // Bind configuration & view instances provided in the scene
+        // Scene references
         Container.Bind<BoardView>().FromInstance(boardView).AsSingle();
         Container.Bind<LayoutConfig>().FromInstance(layoutConfig).AsSingle();
         Container.Bind<CardData[]>().FromInstance(cardPool).AsSingle();
 
-        // Bind presenter with automatic construction & injection
+        // Presenter
         Container.Bind<GamePresenter>().AsSingle().NonLazy();
+
+        // Hook for pause/quit saving
+        Container.BindInterfacesAndSelfTo<GameLifecycleHandler>().AsSingle().NonLazy();
     }
 }

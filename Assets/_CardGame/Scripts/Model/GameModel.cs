@@ -11,14 +11,18 @@ public class GameModel
 
     private readonly List<CardModel> tempFaceUp = new List<CardModel>();
 
-    public void ResetModel(IEnumerable<CardModel> cards)
+    public void ResetModel()
     {
         Cards.Clear();
-        foreach (var c in cards) Cards.Add(c);
         Score.Value = 0;
         Moves.Value = 0;
         Combo.Value = 0;
         IsBusy.Value = false;
+    }
+
+    public void AddCard(CardModel card)
+    {
+        Cards.Add(card);
     }
 
     public List<CardModel> GetFaceUpInteractableCards()
@@ -29,4 +33,29 @@ public class GameModel
                 tempFaceUp.Add(c);
         return tempFaceUp;
     }
+
+    #region SAVE_SYSTEM
+
+    public GameSaveData ToSaveData()
+    {
+        var data = new GameSaveData();
+        data.score = Score.Value;
+        data.combo = Combo.Value;
+        data.moves = Moves.Value;
+
+        foreach (var card in Cards)
+        {
+            data.cards.Add(new CardSaveData
+            {
+                id = card.id,
+                uniqueInstanceId = card.uniqueInstanceId,
+                state = card.State.Value.ToString(),
+                isInteractable = card.IsInteractable.Value
+            });
+        }
+
+        return data;
+    }
+
+    #endregion
 }

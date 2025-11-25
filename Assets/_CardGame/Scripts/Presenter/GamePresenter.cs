@@ -3,7 +3,6 @@ using UniRx;
 using UnityEngine;
 using System.Linq;
 using System;
-using DG.Tweening;
 
 public class GamePresenter : IDisposable
 {
@@ -16,13 +15,24 @@ public class GamePresenter : IDisposable
 
     private bool processingComparison = false;
 
-    public GamePresenter(GameModel model, BoardView boardView, LayoutConfig layout, IEnumerable<CardData> cardDatas)
+    public GamePresenter(GameModel model,
+        BoardView boardView,
+        LayoutConfig layout,
+        IEnumerable<CardData> cardDatas,
+        GameSaveData gameSaveData)
     {
         this.model = model;
         this.boardView = boardView;
         this.layout = layout;
 
-        SetupBoard(cardDatas);
+        if (gameSaveData != null)
+        {
+            RestoreFromSave(gameSaveData, cardDatas);
+        }
+        else
+        {
+            SetupBoard(cardDatas);
+        }
 
         // Subscribe to queue
         comparisonQueue
@@ -48,22 +58,19 @@ public class GamePresenter : IDisposable
         var rnd = new System.Random();
         idList = idList.OrderBy(_ => rnd.Next()).ToList();
 
-        // Create models
-        var cardModels = new List<CardModel>();
-        for (int i = 0; i < idList.Count; i++)
-        {
-            cardModels.Add(new CardModel(idList[i], i));
-        }
-        this.model.ResetModel(cardModels);
+        this.model.ResetModel();
 
         // Instantiate views and presenters
         boardView.Clear();
-        for (int i = 0; i < cardModels.Count; i++)
+        for (int i = 0; i < idList.Count; i++)
         {
             var cardView = boardView.CreateCard();
-            var cardModel = cardModels[i];
-            var cardData = cardDatas.First(d => d.id == cardModels[i].id);
-            var cardPresenter = new CardPresenter(cardModels[i], cardView, cardData.frontSprite);
+            var cardModel = new CardModel(idList[i], i);
+
+            this.model.AddCard(cardModel);
+
+            var cardData = cardDatas.First(d => d.id == cardModel.id);
+            var cardPresenter = new CardPresenter(cardModel, cardView, cardData.frontSprite);
 
             // Connect clicks
             cardView.OnClicked.Subscribe(_ => OnCardClicked(cardModel)).AddTo(disposables);
@@ -73,10 +80,45 @@ public class GamePresenter : IDisposable
         boardView.ArrangeCardsInGrid(layout);
     }
 
+    private void RestoreFromSave(GameSaveData save, IEnumerable<CardData> cardDatas)
+    {
+        boardView.Clear();
+        this.model.ResetModel();
+
+        // Spawn saved cards
+        foreach (var cardSave in save.cards)
+        {
+            var cardView = boardView.CreateCard();
+            var cardModel = new CardModel(cardSave.id, cardSave.uniqueInstanceId);
+            this.model.AddCard(cardModel);
+
+            if (System.Enum.TryParse(cardSave.state, out CardState parsed))
+                cardModel.SetState(parsed);
+
+            cardModel.IsInteractable.Value = cardSave.isInteractable;
+
+            var cardData = cardDatas.First(x => x.id == cardSave.id);
+            var cardPresenter = new CardPresenter(cardModel, cardView, cardData.frontSprite);
+
+            // Connect clicks
+            cardView.OnClicked.Subscribe(_ => OnCardClicked(cardModel)).AddTo(disposables);
+            presenters.Add(cardPresenter);
+        }
+
+        // Arrange cards in board
+        boardView.ArrangeCardsInGrid(layout);
+
+        // Set scores
+        model.Score.Value = save.score;
+        model.Combo.Value = save.combo;
+        model.Moves.Value = save.moves;
+    }
+
     private void OnCardClicked(CardModel cardModel)
     {
         if (!cardModel.IsInteractable.Value || cardModel.State.Value != CardState.FaceDown) return;
 
+        model.Moves.Value += 1;
         cardModel.SetState(CardState.FaceUp);
 
         // If we have two face-up cards, enqueue a comparison
@@ -113,7 +155,16 @@ public class GamePresenter : IDisposable
         {
             a.SetState(CardState.Matched);
             b.SetState(CardState.Matched);
+            model.Score.Value += 1;
             model.Combo.Value += 1;
+
+            // combo bonus
+            if (model.Combo.Value >= 2)
+            {
+                int bonus = CalculateBonus(model.Combo.Value);
+                model.Score.Value += bonus;
+                model.Combo.Value = 0;
+            }
         }
         else
         {
@@ -128,9 +179,14 @@ public class GamePresenter : IDisposable
             b.IsInteractable.Value = true;
         }
 
-        model.Moves.Value += 1;
-
         processingComparison = false;
+    }
+
+    // Helper method for dynamic bonus
+    private int CalculateBonus(int combo)
+    {
+        // Exponential growth
+        return Mathf.Min((int)Mathf.Pow(2, combo - 2), 10); // combo 2 => 1, combo 3 => 2, combo 4 => 4, etc.
     }
 
     public void Dispose()
