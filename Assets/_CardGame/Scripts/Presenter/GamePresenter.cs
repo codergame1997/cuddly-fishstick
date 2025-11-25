@@ -3,7 +3,6 @@ using UniRx;
 using UnityEngine;
 using System.Linq;
 using System;
-using DG.Tweening;
 
 public class GamePresenter : IDisposable
 {
@@ -21,22 +20,24 @@ public class GamePresenter : IDisposable
 
     public GamePresenter(GameModel model,
         BoardView boardView,
-        LayoutConfig layout,
         IEnumerable<CardData> cardDatas,
         GameSaveData gameSaveData,
         AudioService audioService)
     {
         this.model = model;
         this.boardView = boardView;
-        this.layout = layout;
         this.audioService = audioService;
 
-        if (gameSaveData != null)
+        if (GameContext.IsLoadGame)
         {
+            this.layout = gameSaveData.layoutConfig;
+            this.model.SetLayout(this.layout);
             RestoreFromSave(gameSaveData, cardDatas);
         }
         else
         {
+            this.layout = GameContext.SelectedLayout;
+            this.model.SetLayout(this.layout);
             SetupBoard(cardDatas);
         }
 

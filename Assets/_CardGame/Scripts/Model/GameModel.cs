@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UniRx;
+using System.Linq;
 
 public class GameModel
 {
@@ -8,6 +9,8 @@ public class GameModel
     public ReactiveProperty<int> Moves { get; } = new ReactiveProperty<int>(0);
     public ReactiveProperty<bool> IsBusy { get; } = new ReactiveProperty<bool>(false);
     public ReactiveProperty<int> Combo { get; } = new ReactiveProperty<int>(0);
+
+    private LayoutConfig selectedLayout;
 
     private readonly List<CardModel> tempFaceUp = new List<CardModel>();
 
@@ -18,6 +21,11 @@ public class GameModel
         Moves.Value = 0;
         Combo.Value = 0;
         IsBusy.Value = false;
+    }
+
+    public void SetLayout(LayoutConfig layoutConfig)
+    {
+        selectedLayout = layoutConfig;
     }
 
     public void AddCard(CardModel card)
@@ -42,6 +50,7 @@ public class GameModel
         data.score = Score.Value;
         data.combo = Combo.Value;
         data.moves = Moves.Value;
+        data.layoutConfig = selectedLayout;
 
         foreach (var card in Cards)
         {

@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "CardMatchGame/LayoutConfig")]
-public class LayoutConfig : ScriptableObject
+[System.Serializable]
+public class LayoutConfig
 {
     public int columns = 4;
     public int rows = 3;

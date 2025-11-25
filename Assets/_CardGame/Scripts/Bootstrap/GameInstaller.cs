@@ -4,9 +4,10 @@ using UnityEngine;
 public class GameInstaller : MonoInstaller
 {
     [SerializeField] private BoardView boardView;
-    [SerializeField] private LayoutConfig layoutConfig;
+    [SerializeField] private GameplayMenuView gameplayMenuView;
     [SerializeField] private CardData[] cardPool;
     [SerializeField] private AudioService audioService;
+    [SerializeField] private SoundDatabase soundDatabase;
 
     public override void InstallBindings()
     {
@@ -16,16 +17,16 @@ public class GameInstaller : MonoInstaller
 
         // Scene references
         Container.Bind<BoardView>().FromInstance(boardView).AsSingle();
-        Container.Bind<LayoutConfig>().FromInstance(layoutConfig).AsSingle();
+        Container.Bind<GameplayMenuView>().FromInstance(gameplayMenuView).AsSingle();
         Container.Bind<CardData[]>().FromInstance(cardPool).AsSingle();
-
-        // Audio service in scene
         Container.Bind<AudioService>().FromInstance(audioService).AsSingle();
+        Container.Bind<SoundDatabase>().FromInstance(soundDatabase).AsSingle();
 
-        // Presenter
+        // Presenters
         Container.Bind<GamePresenter>().AsSingle().NonLazy();
+        Container.Bind<GameplayMenuPresenter>().AsSingle().NonLazy();
 
-        // Hook for pause/quit saving
+        // Create lifecycle handler for saving
         Container.BindInterfacesAndSelfTo<GameLifecycleHandler>().AsSingle().NonLazy();
     }
 }

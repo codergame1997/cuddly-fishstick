@@ -31,6 +31,14 @@ public class SaveService : ISaveService
         }
     }
 
+    public bool HasSave()
+    {
+        if (!File.Exists(savePath))
+            return false;
+        else
+            return true;
+    }
+
     public void DeleteSave()
     {
         if (File.Exists(savePath))

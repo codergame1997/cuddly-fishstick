@@ -7,7 +7,7 @@ public class GameSaveData
     public int score;
     public int combo;
     public int moves;
-
+    public LayoutConfig layoutConfig;
     public List<CardSaveData> cards = new List<CardSaveData>();
 }
 
