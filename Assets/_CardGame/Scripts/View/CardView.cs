@@ -15,7 +15,7 @@ public class CardView : MonoBehaviour
     // events for presenter
     public Subject<Unit> OnClicked { get; } = new Subject<Unit>();
 
-    void Awake()
+    void OnEnable()
     {
         if (button == null) button = GetComponent<Button>();
         button.onClick.AddListener(() => OnClicked.OnNext(Unit.Default));

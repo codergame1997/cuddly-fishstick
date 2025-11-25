@@ -61,11 +61,12 @@ public class GamePresenter : IDisposable
         for (int i = 0; i < cardModels.Count; i++)
         {
             var cardView = boardView.CreateCard();
+            var cardModel = cardModels[i];
             var cardData = cardDatas.First(d => d.id == cardModels[i].id);
             var cardPresenter = new CardPresenter(cardModels[i], cardView, cardData.frontSprite);
 
             // Connect clicks
-            cardView.OnClicked.Subscribe(_ => OnCardClicked(cardModels[i])).AddTo(disposables);
+            cardView.OnClicked.Subscribe(_ => OnCardClicked(cardModel)).AddTo(disposables);
             presenters.Add(cardPresenter);
         }
 
