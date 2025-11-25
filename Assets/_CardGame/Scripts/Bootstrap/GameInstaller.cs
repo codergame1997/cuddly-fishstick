@@ -3,9 +3,10 @@ using UnityEngine;
 
 public class GameInstaller : MonoInstaller
 {
-    public BoardView boardView;
-    public LayoutConfig layoutConfig;
-    public CardData[] cardPool;
+    [SerializeField] private BoardView boardView;
+    [SerializeField] private LayoutConfig layoutConfig;
+    [SerializeField] private CardData[] cardPool;
+    [SerializeField] private AudioService audioService;
 
     public override void InstallBindings()
     {
@@ -17,6 +18,9 @@ public class GameInstaller : MonoInstaller
         Container.Bind<BoardView>().FromInstance(boardView).AsSingle();
         Container.Bind<LayoutConfig>().FromInstance(layoutConfig).AsSingle();
         Container.Bind<CardData[]>().FromInstance(cardPool).AsSingle();
+
+        // Audio service in scene
+        Container.Bind<AudioService>().FromInstance(audioService).AsSingle();
 
         // Presenter
         Container.Bind<GamePresenter>().AsSingle().NonLazy();

@@ -3,6 +3,7 @@ using UniRx;
 using UnityEngine;
 using System.Linq;
 using System;
+using DG.Tweening;
 
 public class GamePresenter : IDisposable
 {
@@ -12,18 +13,23 @@ public class GamePresenter : IDisposable
     private readonly List<CardPresenter> presenters = new List<CardPresenter>();
     private readonly Subject<Unit> comparisonQueue = new Subject<Unit>();
     private readonly CompositeDisposable disposables = new CompositeDisposable();
+    private readonly Subject<Unit> onGameOver = new Subject<Unit>();
+    private readonly IAudioService audioService;
 
     private bool processingComparison = false;
+    private bool gameOverTriggered = false; // prevent multiple triggers
 
     public GamePresenter(GameModel model,
         BoardView boardView,
         LayoutConfig layout,
         IEnumerable<CardData> cardDatas,
-        GameSaveData gameSaveData)
+        GameSaveData gameSaveData,
+        AudioService audioService)
     {
         this.model = model;
         this.boardView = boardView;
         this.layout = layout;
+        this.audioService = audioService;
 
         if (gameSaveData != null)
         {
@@ -118,6 +124,7 @@ public class GamePresenter : IDisposable
     {
         if (!cardModel.IsInteractable.Value || cardModel.State.Value != CardState.FaceDown) return;
 
+        OnCardFlipped();
         model.Moves.Value += 1;
         cardModel.SetState(CardState.FaceUp);
 
@@ -153,21 +160,26 @@ public class GamePresenter : IDisposable
         bool isMatch = a.id == b.id;
         if (isMatch)
         {
+            OnCardMatched();
             a.SetState(CardState.Matched);
             b.SetState(CardState.Matched);
             model.Score.Value += 1;
             model.Combo.Value += 1;
 
-            // combo bonus
+            // Combo bonus
             if (model.Combo.Value >= 2)
             {
                 int bonus = CalculateBonus(model.Combo.Value);
                 model.Score.Value += bonus;
                 model.Combo.Value = 0;
             }
+
+            // Check for Game Over
+            CheckGameOver();
         }
         else
         {
+            OnCardMisMatched();
             model.Combo.Value = 0;
 
             // Wait a bit so user sees the pair
@@ -187,6 +199,46 @@ public class GamePresenter : IDisposable
     {
         // Exponential growth
         return Mathf.Min((int)Mathf.Pow(2, combo - 2), 10); // combo 2 => 1, combo 3 => 2, combo 4 => 4, etc.
+    }
+
+    #region AUDIO_EVENTS
+
+    private void OnCardMatched()
+    {
+        audioService.Play(SoundType.Match);
+    }
+
+    private void OnCardMisMatched()
+    {
+        audioService.Play(SoundType.Mismatch);
+    }
+
+    private void OnCardFlipped()
+    {
+        audioService.Play(SoundType.Flip);
+    }
+
+    private void OnGameOver()
+    {
+        audioService.Play(SoundType.GameOver);
+    }
+
+    #endregion
+
+    private void CheckGameOver()
+    {
+        if (gameOverTriggered) return;
+
+        bool allMatched = model.Cards.All(c => c.State.Value == CardState.Matched);
+        if (allMatched)
+        {
+            gameOverTriggered = true;
+            OnGameOver();
+
+            // Emit event so other elements can react
+            onGameOver.OnNext(Unit.Default);
+            onGameOver.OnCompleted();
+        }
     }
 
     public void Dispose()

@@ -417,6 +417,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 4393e98c2b2274126a0a733b3461174c, type: 2}
   - {fileID: 11400000, guid: e30d1affec511489cad4dcfafd4b733c, type: 2}
   - {fileID: 11400000, guid: 1a7b9816cf1ea4d1da99e6d3bfb068b2, type: 2}
+  audioService: {fileID: 1828368432}
 --- !u!4 &1285247270
 Transform:
   m_ObjectHideFlags: 0
@@ -554,3 +555,49 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 6428550470299798692, guid: 118c1ce890bdf479189ace86be64dc1b, type: 3}
   m_PrefabInstance: {fileID: 1580622063}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1828368431
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1828368433}
+  - component: {fileID: 1828368432}
+  m_Layer: 0
+  m_Name: GameAudio
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1828368432
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1828368431}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1fcfbc94921c4e36be8a9de22b27cf5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  soundDatabase: {fileID: 11400000, guid: c4e0f2efd44ed4190965856447d8861f, type: 2}
+  poolSize: 8
+--- !u!4 &1828368433
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1828368431}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
