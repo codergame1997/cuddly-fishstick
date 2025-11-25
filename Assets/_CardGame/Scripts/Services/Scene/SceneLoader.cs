@@ -6,4 +6,9 @@ public class SceneLoader : ISceneLoader
     {
         SceneManager.LoadScene(sceneName);
     }
+
+    public void LoadScene(int sceneIndex)
+    {
+        SceneManager.LoadScene(sceneIndex);
+    }
 }

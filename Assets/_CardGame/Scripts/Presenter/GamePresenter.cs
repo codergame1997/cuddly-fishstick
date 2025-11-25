@@ -12,8 +12,10 @@ public class GamePresenter : IDisposable
     private readonly List<CardPresenter> presenters = new List<CardPresenter>();
     private readonly Subject<Unit> comparisonQueue = new Subject<Unit>();
     private readonly CompositeDisposable disposables = new CompositeDisposable();
-    private readonly Subject<Unit> onGameOver = new Subject<Unit>();
     private readonly IAudioService audioService;
+
+    public readonly AsyncSubject<Unit> onCompleteBoardSetUp = new AsyncSubject<Unit>();
+    public readonly Subject<Unit> onGameOver = new Subject<Unit>();
 
     private bool processingComparison = false;
     private bool gameOverTriggered = false; // prevent multiple triggers
@@ -85,6 +87,8 @@ public class GamePresenter : IDisposable
         }
 
         boardView.ArrangeCardsInGrid(layout);
+        onCompleteBoardSetUp.OnNext(Unit.Default);
+        onCompleteBoardSetUp.OnCompleted();
     }
 
     private void RestoreFromSave(GameSaveData save, IEnumerable<CardData> cardDatas)
@@ -119,6 +123,9 @@ public class GamePresenter : IDisposable
         model.Score.Value = save.score;
         model.Combo.Value = save.combo;
         model.Moves.Value = save.moves;
+
+        onCompleteBoardSetUp.OnNext(Unit.Default);
+        onCompleteBoardSetUp.OnCompleted();
     }
 
     private void OnCardClicked(CardModel cardModel)
@@ -172,7 +179,6 @@ public class GamePresenter : IDisposable
             {
                 int bonus = CalculateBonus(model.Combo.Value);
                 model.Score.Value += bonus;
-                model.Combo.Value = 0;
             }
 
             // Check for Game Over

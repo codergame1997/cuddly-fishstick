@@ -21,6 +21,7 @@ public class BoardView : MonoBehaviour
         }
     }
 
+    // Arrange cards in grid as per layout
     public void ArrangeCardsInGrid(LayoutConfig layout)
     {
         if (gridLayout == null)

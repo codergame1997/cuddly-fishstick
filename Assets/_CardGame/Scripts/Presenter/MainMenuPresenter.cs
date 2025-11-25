@@ -22,14 +22,17 @@ public class MainMenuPresenter
         bool hasSave = saveService.HasSave();
         view.SetLoadButtonInteractable(hasSave);
 
+        // play button logic
         view.playButton.OnClickAsObservable()
             .Subscribe(_ => StartNewGame())
             .AddTo(view);
 
+        // load button logic
         view.loadButton.OnClickAsObservable()
             .Subscribe(_ => LoadSavedGame())
             .AddTo(view);
 
+        // exit button logic
         view.exitButton.OnClickAsObservable()
             .Subscribe(_ => Application.Quit())
             .AddTo(view);
@@ -40,12 +43,12 @@ public class MainMenuPresenter
         var randomLayout = layoutDatabase.GetRandomLayout();
         GameContext.SelectedLayout = randomLayout; // store selection globally
         GameContext.IsLoadGame = false;
-        sceneLoader.LoadScene("2. GamePlay");
+        sceneLoader.LoadScene(1);
     }
 
     private void LoadSavedGame()
     {
         GameContext.IsLoadGame = true;
-        sceneLoader.LoadScene("2. GamePlay");
+        sceneLoader.LoadScene(1);
     }
 }

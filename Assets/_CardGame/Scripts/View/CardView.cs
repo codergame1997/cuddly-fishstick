@@ -23,6 +23,7 @@ public class CardView : MonoBehaviour
 
     public void SetFrontSprite(Sprite s) => frontImage.sprite = s;
 
+    // Card flip animation
     public Tween Flip(bool faceUp, float duration = 0.35f)
     {
         Sequence seq = DOTween.Sequence();
@@ -36,6 +37,7 @@ public class CardView : MonoBehaviour
         return seq;
     }
 
+    // Card match animation
     public Tween PlayMatchedAnimation()
     {
         return rectTransform
