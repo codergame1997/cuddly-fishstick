@@ -1,12 +1,42 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class BoardView : MonoBehaviour
 {
-    public RectTransform container; // area that holds cards
-    public GameObject cardPrefab;
+    [SerializeField] private RectTransform container; // area that holds cards
+    [SerializeField] private GameObject cardPrefab;
+
+    private GridLayoutGroup gridLayout;
 
     private readonly List<CardView> liveViews = new List<CardView>();
+
+    void Awake()
+    {
+        if (gridLayout == null)
+        {
+            gridLayout = container.GetComponent<GridLayoutGroup>();
+            if (gridLayout == null)
+                gridLayout = container.gameObject.AddComponent<GridLayoutGroup>();
+        }
+    }
+
+    public void ArrangeCardsInGrid(LayoutConfig layout)
+    {
+        if (gridLayout == null)
+            gridLayout = container.GetComponent<GridLayoutGroup>();
+
+        Vector2 parentSize = container.rect.size;
+
+        float cardWidth = (parentSize.x - (layout.columns - 1) * layout.spacing.x) / layout.columns;
+        float cardHeight = (parentSize.y - (layout.rows - 1) * layout.spacing.y) / layout.rows;
+
+        gridLayout.cellSize = new Vector2(cardWidth, cardHeight);
+        gridLayout.spacing = layout.spacing;
+        gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+        gridLayout.constraintCount = layout.columns;
+        gridLayout.childAlignment = TextAnchor.MiddleCenter;
+    }
 
     public void Clear()
     {

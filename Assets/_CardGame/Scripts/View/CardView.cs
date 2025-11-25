@@ -7,10 +7,10 @@ using UniRx;
 public class CardView : MonoBehaviour
 {
     [Header("References")]
-    public Image frontImage;
-    public Image backImage;
-    public RectTransform rectTransform;
-    public Button button;
+    [SerializeField] private Image frontImage;
+    [SerializeField] private Image backImage;
+    [SerializeField] private RectTransform rectTransform;
+    [SerializeField] private Button button;
 
     // events for presenter
     public Subject<Unit> OnClicked { get; } = new Subject<Unit>();
@@ -23,7 +23,6 @@ public class CardView : MonoBehaviour
 
     public void SetFrontSprite(Sprite s) => frontImage.sprite = s;
 
-    // TODO Test animation when UI and temp game logic is completed
     public Tween Flip(bool faceUp, float duration = 0.35f)
     {
         Sequence seq = DOTween.Sequence();
@@ -37,13 +36,12 @@ public class CardView : MonoBehaviour
         return seq;
     }
 
-    // TODO Test animation when UI and temp game logic is completed
     public Tween PlayMatchedAnimation()
     {
         return rectTransform
             .DOScale(0f, 0.4f)
             .SetEase(Ease.InBack)
-            .OnComplete(() => gameObject.SetActive(false));
+            .OnComplete(() => button.interactable = false);
     }
 
     public void SetInteractable(bool v) => button.interactable = v;

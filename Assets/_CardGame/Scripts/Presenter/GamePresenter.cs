@@ -70,7 +70,7 @@ public class GamePresenter : IDisposable
             presenters.Add(cardPresenter);
         }
 
-        // TODO: Responsive layout logic
+        boardView.ArrangeCardsInGrid(layout);
     }
 
     private void OnCardClicked(CardModel cardModel)

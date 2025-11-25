@@ -10,8 +10,6 @@ public class CardPresenter : IDisposable
 
     private CompositeDisposable disposables = new CompositeDisposable();
 
-    public IObservable<Unit> OnRequestFlip => view.OnClicked;
-
     public CardPresenter(CardModel model, CardView view, Sprite frontSprite)
     {
         this.model = model;
@@ -28,9 +26,7 @@ public class CardPresenter : IDisposable
 
     private void HandleClick()
     {
-        if (!model.IsInteractable.Value || model.State.Value != CardState.FaceDown) return;
-        // presenter will notify higher level (game presenter). We'll expose click event
-        // via the OnRequestFlip in the creator, but here we'll simply forward via view's subject.
+        // Can add card specific click animation, sound, etc
     }
 
     private void OnModelStateChanged(CardState state)
@@ -45,8 +41,7 @@ public class CardPresenter : IDisposable
                 view.Flip(true);
                 break;
             case CardState.Matched:
-                // play matched animation (scale out)
-                view.transform.DOPunchScale(Vector3.one * 0.2f, 0.2f).OnComplete(() => view.gameObject.SetActive(false));
+                view.PlayMatchedAnimation();
                 break;
         }
     }
