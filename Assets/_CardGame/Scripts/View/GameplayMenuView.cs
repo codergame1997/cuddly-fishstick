@@ -43,4 +43,9 @@ public class GameplayMenuView : MonoBehaviour
             })
             .AddTo(this);
     }
+
+    public void ChangeSaveButtonInteractibity(bool value)
+    {
+        saveButton.interactable = value;
+    }
 }

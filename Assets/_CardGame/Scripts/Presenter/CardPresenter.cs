@@ -2,11 +2,14 @@ using UniRx;
 using UnityEngine;
 using System;
 using DG.Tweening;
+using Zenject;
 
-public class CardPresenter : IDisposable
+public class CardPresenter : IInitializable, IDisposable
 {
     public CardModel model { get; }
     public CardView view { get; }
+
+    private Sprite _frontSprite;
 
     private CompositeDisposable disposables = new CompositeDisposable();
 
@@ -14,9 +17,15 @@ public class CardPresenter : IDisposable
     {
         this.model = model;
         this.view = view;
+        this._frontSprite = frontSprite;
+        Initialize();
+    }
+
+    public void Initialize()
+    {
         if (view != null)
         {
-            view.SetFrontSprite(frontSprite);
+            view.SetFrontSprite(_frontSprite);
             view.SetInteractable(model.IsInteractable.Value);
             view.OnClicked.Subscribe(_ => HandleClick()).AddTo(disposables);
             model.State.Subscribe(OnModelStateChanged).AddTo(disposables);

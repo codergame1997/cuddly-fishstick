@@ -1,8 +1,9 @@
 using UniRx;
 using UnityEngine;
 using System;
+using Zenject;
 
-public class MainMenuPresenter
+public class MainMenuPresenter : IInitializable, IDisposable
 {
     private readonly MainMenuView view;
     private readonly SaveService saveService;
@@ -15,6 +16,8 @@ public class MainMenuPresenter
         this.saveService = saveService;
         this.layoutDatabase = layoutDatabase;
         this.sceneLoader = sceneLoader;
+
+        Initialize();
     }
 
     public void Initialize()
@@ -50,5 +53,10 @@ public class MainMenuPresenter
     {
         GameContext.IsLoadGame = true;
         sceneLoader.LoadScene(1);
+    }
+
+    public void Dispose()
+    {
+        // Clean up if needed
     }
 }
